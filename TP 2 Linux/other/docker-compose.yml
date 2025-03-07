@@ -1,0 +1,29 @@
+services:
+  web:
+    image: my-python-app
+    build: .
+    container_name: web
+    environment:
+      - PORT=443
+      - DB_HOST=db
+  db:
+    image: mysql
+    container_name: db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: l3z
+    volumes: 
+      - ./seed.sql:/docker-entrypoint-initdb.d/seed.sql:ro
+  phpmyadmin:
+    image: phpmyadmin:latest
+    depends_on:
+      - db
+  reverse-proxy:
+    image: nginx:latest
+    container_name: reverse-proxy
+    ports:
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/default.conf:ro
+      - ./www.supersite.com.crt:/etc/nginx/tp2/I/www.supersite.com.crt
+      - ./www.supersite.com.key:/etc/nginx/tp2/I/www.supersite.com.crt
